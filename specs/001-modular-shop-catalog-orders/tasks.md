@@ -26,6 +26,70 @@ implementation and testing of each story.
 
 Per `plan.md` Project Structure: `src/Gateway/`, `src/Modules/ModuleA/{Domain,Infrastructure,Application,Query,Integration.Query,Api}/`, `src/Modules/ModuleB/{same six}/`, solution root `ModularShop.sln` + `Directory.Build.props`.
 
+> **As-built (2026-07-08)**: solution root is `SingleMultiIoc.slnx`, not
+> `ModularShop.sln`. Actual project sets are `src/Modules/ModuleA/{Domain,Infrastructure,Application,Api}/`
+> (no `Query`, no `Integration.Query`) and `src/Modules/ModuleB/{Domain,Infrastructure,Application,Integration.Query,Api}/`
+> (no `Query`). See the "As-Built Deviations" section below and `plan.md`'s
+> Constitution Check for the full detail. The task checklist itself is left
+> unedited below as the historical execution record.
+
+## As-Built Deviations (added 2026-07-08 — do not renumber existing tasks)
+
+A later refactor (see `git log`: "reorganize modules into vertical feature
+slices, add CAP publisher and seed data") changed several things this task
+list originally specified. Recorded here rather than rewriting completed,
+checked-off tasks:
+
+- **T001, T016**: solution file is `SingleMultiIoc.slnx` (renamed from
+  `ModularShop.slnx`/`.sln`), not `ModularShop.sln`.
+- **T005, T007, T011**: `ModuleA.Query`, `ModuleA.Integration.Query`, and
+  `ModuleB.Query` do not exist in the current solution. DTOs live inline
+  under each module's `Application` feature folders instead. This is an
+  unresolved violation of constitution Principle II — see `plan.md`
+  Complexity Tracking.
+- **T025, T026, T027**: `IOrderIntegrationQuery` and `OrderIntegrationQuery`
+  were replaced by a MediatR request/handler pair —
+  `ModuleB.Integration.Query.HasOrdersForProduct.Query` (record, in the
+  `ModuleB.Integration.Query` project from T013) implemented by
+  `ModuleB.Application.HasOrdersForProduct.Handler`. The original interface
+  and implementation survive only as commented-out dead code in
+  `ModuleB.Application/OrderIntegrationQuery.cs`. See `data-model.md` and
+  `contracts/integration-contracts.md`.
+- **T028, T029, T031**: `ModuleAStartup`/`ModuleBStartup` do not build
+  independent child `ServiceProvider`s for application services. Both
+  modules register directly on the Gateway's global `IServiceCollection`
+  ("Single IoC" — constitution Principle III, amended). Each keeps only a
+  small private, publish-only child container to obtain its own
+  `ICapPublisher` (wrapped as `IModule{Name}CapPublisher`); `ChildContainerHost`
+  (T030) pumps those two child containers' hosted services, not full
+  per-module application containers.
+- **T035, T036**: `GetProductsQuery`/`Handler` and
+  `CheckAvailabilityCommand`/`Handler` live under
+  `ModuleA.Application/Features/GetProducts/` and
+  `ModuleA.Application/Features/CheckAvailability/`, not as flat files
+  directly under `ModuleA.Application/`.
+- **T041, T042**: `GetOrdersQuery`/`Handler` and
+  `PlaceOrderCommand`/`Handler` live under `ModuleB.Application/GetOrders/`
+  and `ModuleB.Application/PlaceOrder/`, not as flat files.
+- **T047, T048**: the subscriber is
+  `ModuleA.Application/Subscribers/OrderPlacedIntegrationEvent/Subscriber.cs`
+  (+ a local `Message.cs` record), not a flat
+  `OrderPlacedIntegrationEventHandler.cs`. It's registered as
+  `ICapSubscribe` on the Gateway's **global** container (via
+  `ModuleAStartup`), which the Gateway's own global CAP instance discovers —
+  not a Module-A-owned CAP instance, since Module A's own `AddCap()` call is
+  publish-only (constitution Principle IV, amended).
+- **Not originally task-listed**: both modules now ship EF Core seed data
+  (`ModuleA.Infrastructure/SeedData.cs` — 3 products; `ModuleB.Infrastructure/SeedData.cs`
+  — 2 orders), applied via the `SeedProducts`/`SeedOrders` migrations. This
+  removes the manual-seeding step `quickstart.md` originally assumed for
+  User Story 1/2 validation.
+- **Known stale leftovers, not yet fixed**: `ModuleADbContextFactory.cs` and
+  `ModuleBDbContextFactory.cs` still hardcode pre-rename `ModularShop_ModuleA`/
+  `ModularShop_ModuleB` connection strings; `src/Gateway/appsettings.Development.json`
+  still uses the old `ModularShop_Module` naming (single shared DB, all three
+  keys) and has no `Cap:Transport` key at all.
+
 ---
 
 ## Phase 1: Setup (Shared Infrastructure)

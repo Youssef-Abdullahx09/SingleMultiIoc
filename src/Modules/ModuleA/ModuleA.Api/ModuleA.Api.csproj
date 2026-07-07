@@ -8,13 +8,6 @@
     <ProjectReference Include="..\ModuleA.Application\ModuleA.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="DotNetCore.CAP" Version="10.0.0" />
-    <PackageReference Include="DotNetCore.CAP.RabbitMQ" Version="10.0.0" />
-    <PackageReference Include="DotNetCore.CAP.SqlServer" Version="10.0.0" />
-    <PackageReference Include="Savorboard.CAP.InMemoryMessageQueue" Version="10.0.0" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

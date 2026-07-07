@@ -18,5 +18,7 @@ public sealed class ModuleBDbContext(DbContextOptions<ModuleBDbContext> options)
             entity.Property(o => o.Quantity).IsRequired();
             entity.Property(o => o.PlacedAtUtc).IsRequired();
         });
+
+        modelBuilder.Entity<Order>().HasData(SeedData.Orders);
     }
 }

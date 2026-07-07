@@ -3,18 +3,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModuleA.Domain;
 using ModuleA.Infrastructure;
-using ModuleB.Integration.Query;
 
-namespace ModuleA.Application;
+namespace ModuleA.Application.Subscribers.OrderPlacedIntegrationEvent;
 
 // CAP subscriber (constitution Principle V - the async seam). Idempotent on
 // EventId so at-least-once redelivery (FR-009) never records a duplicate receipt.
-public sealed class OrderPlacedIntegrationEventHandler(
+public sealed class Subscriber(
     ModuleADbContext dbContext,
-    ILogger<OrderPlacedIntegrationEventHandler> logger) : ICapSubscribe
+    ILogger<Subscriber> logger) : ICapSubscribe
 {
     [CapSubscribe("moduleb.order.placed")]
-    public async Task Handle(OrderPlacedIntegrationEvent integrationEvent)
+    public async Task Handle(Message integrationEvent)
     {
         var alreadyReceived = await dbContext.OrderReceipts
             .AnyAsync(r => r.IntegrationEventId == integrationEvent.EventId);

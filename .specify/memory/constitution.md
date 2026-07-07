@@ -1,24 +1,27 @@
 <!--
 Sync Impact Report
-Version change: [TEMPLATE] → 1.0.0 (initial ratification)
-Modified principles: n/a (first concrete version)
-Added sections:
-  - Core Principles I–VI (Gateway-Only Execution & Module Boundaries;
-    Strict Six-Project Module Layering; Isolated DI via Child Containers;
-    CAP Messaging Isolation; In-Module Mediation & Cross-Module Contracts;
-    Per-Module Data Ownership)
-  - Technology Stack Constraints
-  - Development Workflow & Quality Gates
-  - Governance
+Version change: 1.1.0 → 1.2.0
+Modified principles:
+  - III. Isolated DI via Child Containers (Multi IoC), with a Recorded
+    Single IoC Exception → III. Single IoC: Global Registration with
+    Isolated Publish-Only Child Containers: Module B has converged onto the
+    same Single IoC pattern as Module A (all application services on the
+    Gateway's global container); no module demonstrates the original
+    per-module Multi IoC child-container pattern anymore. Only each
+    module's outbound CAP publisher keeps a private child container.
+  - IV. CAP Messaging Isolation (per Module's DI Variant) → IV. CAP
+    Messaging Isolation via Publish-Only Child Containers: documents Module
+    B's own private publish-only CAP container (schema cap_moduleb, group
+    moduleb.orders) and its IModuleBCapPublisher abstraction, alongside
+    Module A's existing split (private publish / global subscribe).
+Added sections: none (expanded existing III/IV in place)
 Removed sections: none
 Templates requiring updates:
   - .specify/templates/plan-template.md ✅ no change needed (Constitution Check gate is derived dynamically per-plan)
   - .specify/templates/spec-template.md ✅ no change needed (technology-agnostic, no principle references)
   - .specify/templates/tasks-template.md ✅ no change needed (generic phase structure, no principle references)
   - .specify/templates/checklist-template.md ✅ no change needed (generic)
-Follow-up TODOs:
-  - TODO(RATIFICATION_DATE): original adoption date unknown at authoring time; set to
-    the date this constitution was first written (2026-07-07) per project convention.
+Follow-up TODOs: none
 -->
 
 # TechnoIsland SingleMultiIOC Constitution
@@ -66,38 +69,77 @@ The inverted `Application → Infrastructure` reference is a deliberate,
 recorded decision for this codebase, not an oversight — it must survive
 future refactors and code reviews unchanged.
 
-### III. Isolated DI via Child Containers
+### III. Single IoC: Global Registration with Isolated Publish-Only Child Containers
 
-Each module builds and owns its own `ServiceCollection`/`ServiceProvider`
-(child container), wired up by a `Module{Name}Startup` class inside that
-module's `Api` project. The Gateway's global container MUST NOT register any
-module-internal service, repository, handler, or `DbContext`. Background work
-belonging to a module's child container (e.g. CAP hosted services) MUST be
-started through a `ChildContainerHost` `IHostedService` registered in the
-global container — the global container starts child hosted services, it does
-not host module services itself.
+Every module registers its application services (DbContext, MediatR,
+cross-module query instances, CAP subscriber handlers) directly on the
+Gateway's global `IServiceCollection`, via a `Module{Name}Startup.AddModule{Name}Services(this IServiceCollection, ...)` extension inside that
+module's `Api` project. Module endpoints resolve dependencies through normal
+minimal API parameter injection against the global provider — no
+module-local scope or provider. The one exception per module is its outbound
+CAP publisher (Principle IV): each keeps a small, private child container
+solely to obtain an isolated `ICapPublisher`, wrapped behind a
+`IModule{Name}CapPublisher` abstraction registered as a singleton on the
+global container. Background work belonging to those private containers
+(the CAP hosted services) MUST be started through a `ChildContainerHost`
+`IHostedService` registered in the global container — the global container
+starts these hosted services, it does not host module application services
+itself.
 
-Rationale: Per-module containers keep module internals genuinely private
-(not just by convention) and prevent lifetime/registration collisions between
-modules that would otherwise share one global container.
+Rationale: This project (`SingleMultiIOC`) originally recorded both a
+"Multi IoC" per-module child-container pattern and a "Single IoC" global
+pattern side by side (Module B and Module A respectively) as a deliberate
+comparison. Both modules have since converged on Single IoC: a single shared
+container is simpler to reason about, and the isolation a full child
+container gives is no longer worth its indirection once every module needs
+the same cross-module DI access. The publish-only child container survives
+per module purely because CAP allows only one `AddCap()` call per container
+(Principle IV) — it is a messaging necessity, not a residual DI-isolation
+stance.
 
-### IV. CAP Messaging Isolation
+### IV. CAP Messaging Isolation via Publish-Only Child Containers
 
 DotNetCore.CAP is the only messaging mechanism for asynchronous, cross-module
-communication. Each module's child container configures its own CAP
-publisher/subscriber using a RAW SQL Server connection string
-(`x.UseSqlServer(connString)`); CAP MUST NOT be bound to a module's
-`DbContext` via `UseEntityFramework`. The Gateway's global container
-configures its own, separate CAP instance. Every CAP instance (each module's
-and the Gateway's) MUST use a unique CAP group name and a distinct table
-prefix or database, so that `cap.Published`/`cap.Received` tables never
-collide across instances.
+communication. CAP MUST NOT be bound to a module's `DbContext` via
+`UseEntityFramework`; every `AddCap(...)` call configures a RAW SQL Server
+connection string (`x.UseSqlServer(connString)`) instead. Every CAP instance
+MUST use a unique CAP group name and a distinct schema, so that
+`cap.Published`/`cap.Received` tables never collide across instances.
+
+Only one `AddCap()` call may exist per `IServiceCollection`/container — a
+second call's configuration silently overwrites the first's scalar options
+(schema, group, connection string), so instances that must stay distinct
+MUST live in separate containers. Since Principle III puts every module's
+application services on the one global container, each module's `AddCap()`
+call instead lives in a small private child container built solely for that
+purpose, and only its `ICapPublisher` is pulled out — wrapped as
+`IModule{Name}CapPublisher` and registered as a singleton on the global
+container — for publishing:
+
+- **Module A**: private container (schema `cap_modulea`, group
+  `modulea.catalog`) for publishing only. It has no CAP call of its own for
+  subscribing — its inbound subscriber (`OrderPlacedIntegrationEventHandler`,
+  an `ICapSubscribe` registered on the global container) is instead
+  discovered and run by the **Gateway's own global CAP instance** (schema
+  `cap_gateway`, group `gateway.global`), since the global container may only
+  host one `AddCap()` call.
+- **Module B**: private container (schema `cap_moduleb`, group
+  `moduleb.orders`) for publishing only. It has no subscriber at all.
+- The Gateway's own global CAP instance therefore serves two roles: its own
+  independent messaging identity, and Module A's subscription engine.
+
+Application code MUST depend on the `IModule{Name}CapPublisher` abstraction,
+never on `ICapPublisher` directly — the private container that produces it
+is an implementation detail.
 
 Rationale: Binding CAP to a module's own `DbContext` would couple message
 outbox persistence to EF Core migrations and transaction scope in ways that
 leak across module boundaries; raw connection strings plus unique
-group/table isolation keep each module's messaging infrastructure
-independently deployable and debuggable.
+group/schema isolation keep each messaging instance independently deployable
+and debuggable. The publish-only child container per module is the direct,
+necessary consequence of Principle III: a module cannot register a second
+`AddCap()` call on the global container it shares with the Gateway and every
+other module.
 
 ### V. In-Module Mediation & Cross-Module Contracts
 
@@ -161,4 +203,4 @@ All plans and PRs MUST verify compliance with the Core Principles above;
 deviations must be recorded in the plan's Complexity Tracking table with a
 concrete justification, or rejected.
 
-**Version**: 1.0.0 | **Ratified**: 2026-07-07 | **Last Amended**: 2026-07-07
+**Version**: 1.2.0 | **Ratified**: 2026-07-07 | **Last Amended**: 2026-07-08

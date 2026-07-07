@@ -1,18 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\ModuleB.Query\ModuleB.Query.csproj" />
     <ProjectReference Include="..\ModuleB.Infrastructure\ModuleB.Infrastructure.csproj" />
     <ProjectReference Include="..\ModuleB.Integration.Query\ModuleB.Integration.Query.csproj" />
   </ItemGroup>
-
+  
   <ItemGroup>
-    <PackageReference Include="DotNetCore.CAP" Version="10.0.0" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <PackageReference Include="MediatR" Version="14.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
   </ItemGroup>
-
+  
+  <ItemGroup>
+    <PackageReference Include="DotNetCore.CAP" Version="10.0.0" />
+    <PackageReference Include="DotNetCore.CAP.RabbitMQ" Version="10.0.0" />
+    <PackageReference Include="DotNetCore.CAP.SqlServer" Version="10.0.0" />
+    <PackageReference Include="Savorboard.CAP.InMemoryMessageQueue" Version="10.0.0" />
+  </ItemGroup>
+  
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

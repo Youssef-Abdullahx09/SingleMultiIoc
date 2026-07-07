@@ -1,60 +1,21 @@
-using DotNetCore.CAP;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using ModuleB.Application;
-using ModuleB.Infrastructure;
-using ModuleB.Integration.Query;
-using Savorboard.CAP.InMemoryMessageQueue;
 
 namespace ModuleB.Api;
 
-// Builds Module B's own isolated child container (constitution Principle III).
-// The Gateway's root container never registers any of these services directly.
+// Module B is the "Single IoC" variant (constitution Principle III, amended): every
+// service registers directly on the Gateway's global `IServiceCollection` - except its
+// outbound CAP publisher, which keeps a small, private child container so Module B's
+// publishing schema/group (Principle IV, amended) stay isolated. Module B has no CAP
+// subscriber, so unlike Module A there is no separate global-subscribe concern here.
 public static class ModuleBStartup
 {
-    public static ServiceProvider BuildServiceProvider(IConfiguration configuration)
+    // Returns Module B's private publish-only CAP child provider purely so the Gateway can
+    // pump its IHostedServices via ChildContainerHost - it is never used to resolve app services.
+    public static IServiceProvider AddModuleBServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var services = new ServiceCollection();
-
-        services.AddLogging(logging => logging.AddConsole());
-
-        var moduleBConnectionString = configuration.GetConnectionString("ModuleB")
-            ?? throw new InvalidOperationException("Missing ConnectionStrings:ModuleB");
-
-        services.AddDbContext<ModuleBDbContext>(options =>
-            options.UseSqlServer(moduleBConnectionString));
-
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(OrderIntegrationQuery).Assembly));
-
-        // Singleton: safe because it creates its own DbContext scope per call (see OrderIntegrationQuery).
-        // This is the instance the Gateway resolves and hands into Module A's container (research.md §1).
-        services.AddSingleton<IOrderIntegrationQuery, OrderIntegrationQuery>();
-
-        services.AddCap(options =>
-        {
-            options.UseSqlServer(sqlServerOptions =>
-            {
-                sqlServerOptions.ConnectionString = moduleBConnectionString;
-                sqlServerOptions.Schema = "cap_moduleb";
-            });
-
-            if (string.Equals(configuration["Cap:Transport"], "InMemory", StringComparison.OrdinalIgnoreCase))
-            {
-                options.UseInMemoryMessageQueue();
-            }
-            else
-            {
-                options.UseRabbitMQ(rabbitMqOptions =>
-                {
-                    rabbitMqOptions.HostName = configuration["RabbitMQ:HostName"] ?? "localhost";
-                });
-            }
-
-            options.DefaultGroupName = "moduleb.orders";
-        });
-
-        return services.BuildServiceProvider();
+        var localServiceProvider = services.AddApplication(configuration);
+        return localServiceProvider;
     }
 }

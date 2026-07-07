@@ -8,8 +8,6 @@
     <Project Path="src/Modules/ModuleA/ModuleA.Application/ModuleA.Application.csproj" />
     <Project Path="src/Modules/ModuleA/ModuleA.Domain/ModuleA.Domain.csproj" />
     <Project Path="src/Modules/ModuleA/ModuleA.Infrastructure/ModuleA.Infrastructure.csproj" />
-    <Project Path="src/Modules/ModuleA/ModuleA.Integration.Query/ModuleA.Integration.Query.csproj" />
-    <Project Path="src/Modules/ModuleA/ModuleA.Query/ModuleA.Query.csproj" />
   </Folder>
   <Folder Name="/src/Modules/ModuleB/">
     <Project Path="src/Modules/ModuleB/ModuleB.Api/ModuleB.Api.csproj" />
@@ -17,6 +15,5 @@
     <Project Path="src/Modules/ModuleB/ModuleB.Domain/ModuleB.Domain.csproj" />
     <Project Path="src/Modules/ModuleB/ModuleB.Infrastructure/ModuleB.Infrastructure.csproj" />
     <Project Path="src/Modules/ModuleB/ModuleB.Integration.Query/ModuleB.Integration.Query.csproj" />
-    <Project Path="src/Modules/ModuleB/ModuleB.Query/ModuleB.Query.csproj" />
   </Folder>
 </Solution>

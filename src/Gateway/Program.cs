@@ -10,9 +10,11 @@ using Savorboard.CAP.InMemoryMessageQueue;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Gateway's own, separate global CAP configuration (constitution Principle IV) -
-// distinct group and schema from every module's CAP instance. Not used by any
-// module; demonstrates the Gateway has its own independent messaging identity.
+// Gateway's own global CAP configuration (constitution Principle IV, amended) -
+// distinct group and schema from Module A's and Module B's own private publish-only
+// instances. Module A's inbound subscription (OrderPlacedIntegrationEventHandler,
+// registered on this same global container) runs on this instance, since only one
+// AddCap() call can live per container.
 builder.Services.AddCap(options =>
 {
     options.UseSqlServer(sqlServerOptions =>
@@ -37,30 +39,31 @@ builder.Services.AddCap(options =>
     options.DefaultGroupName = "gateway.global";
 });
 
-// Build order matters: Module B first, so its IOrderIntegrationQuery instance
-// exists to hand into Module A's container (research.md §1). Module A's project
-// files never reference ModuleB.Application - only ModuleB.Integration.Query.
-var moduleBProvider = ModuleBStartup.BuildServiceProvider(builder.Configuration);
-var orderIntegrationQuery = moduleBProvider.GetRequiredService<ModuleB.Integration.Query.IOrderIntegrationQuery>();
-var moduleAProvider = ModuleAStartup.BuildServiceProvider(builder.Configuration, orderIntegrationQuery);
+// Both modules are the "Single IoC" variant (constitution Principle III, amended):
+// each registers directly on the Gateway's global `builder.Services`. Only each
+// module's outbound CAP publisher keeps a small, private child container (Principle
+// IV, amended); the returned providers exist solely so ChildContainerHost can pump
+// their IHostedServices, never to resolve app services from.
+var moduleACapPublisherProvider = builder.Services.AddModuleAServices(builder.Configuration);
+var moduleBCapPublisherProvider = builder.Services.AddModuleBServices(builder.Configuration);
 
-builder.Services.AddSingleton<IReadOnlyList<IServiceProvider>>([moduleAProvider, moduleBProvider]);
+builder.Services.AddSingleton<IReadOnlyList<IServiceProvider>>([moduleACapPublisherProvider, moduleBCapPublisherProvider]);
 builder.Services.AddHostedService<ChildContainerHost>();
 
 var app = builder.Build();
 
-using (var moduleAMigrationScope = moduleAProvider.CreateScope())
+using (var moduleAMigrationScope = app.Services.CreateScope())
 {
     moduleAMigrationScope.ServiceProvider.GetRequiredService<ModuleADbContext>().Database.Migrate();
 }
 
-using (var moduleBMigrationScope = moduleBProvider.CreateScope())
+using (var moduleBMigrationScope = app.Services.CreateScope())
 {
     moduleBMigrationScope.ServiceProvider.GetRequiredService<ModuleBDbContext>().Database.Migrate();
 }
 
 app.MapGet("/", () => "ModularShop Gateway");
-app.MapCatalogEndpoints(moduleAProvider);
-app.MapOrdersEndpoints(moduleBProvider);
+app.MapCatalogEndpoints();
+app.MapOrdersEndpoints();
 
 app.Run();

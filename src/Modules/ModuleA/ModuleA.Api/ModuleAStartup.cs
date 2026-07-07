@@ -1,63 +1,34 @@
 using DotNetCore.CAP;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using ModuleA.Application;
-using ModuleA.Infrastructure;
-using ModuleB.Integration.Query;
-using Savorboard.CAP.InMemoryMessageQueue;
+using ModuleA.Application.Subscribers.OrderPlacedIntegrationEvent;
 
 namespace ModuleA.Api;
 
-// Builds Module A's own isolated child container (constitution Principle III).
-// `orderIntegrationQuery` is the single resolved instance the Gateway obtained from
-// Module B's already-built container (research.md §1) - Module A never references
-// any ModuleB project except ModuleB.Integration.Query (the interface it implements).
+// Module A is the "Single IoC" variant (constitution Principle III, amended): every
+// service registers directly on the Gateway's global `IServiceCollection` - except its
+// outbound CAP publisher. That stays on a small, private child container so Module A's
+// publishing schema/group (Principle IV, amended) remain isolated; inbound subscription
+// (OrderPlacedIntegrationEventHandler below) is registered on the global container and runs
+// on the Gateway's own global CAP instance instead, since two `AddCap()` calls cannot share
+// one container. Module B (also Single IoC) registers its own `IOrderIntegrationQuery` on
+// this same global container, so `CheckAvailabilityCommandHandler` resolves it directly -
+// no instance needs to be handed in here.
 public static class ModuleAStartup
 {
-    public static ServiceProvider BuildServiceProvider(IConfiguration configuration, IOrderIntegrationQuery orderIntegrationQuery)
+    // Returns Module A's private publish-only CAP child provider purely so the Gateway can
+    // pump its IHostedServices via ChildContainerHost - it is never used to resolve app services.
+    public static IServiceProvider AddModuleAServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var services = new ServiceCollection();
+        var localServiceProvider = services.AddApplication(configuration);
 
-        services.AddLogging(logging => logging.AddConsole());
 
-        var moduleAConnectionString = configuration.GetConnectionString("ModuleA")
-            ?? throw new InvalidOperationException("Missing ConnectionStrings:ModuleA");
-
-        services.AddDbContext<ModuleADbContext>(options =>
-            options.UseSqlServer(moduleAConnectionString));
-
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AssemblyMarker).Assembly));
-
-        services.AddSingleton(orderIntegrationQuery);
-
-        // CAP discovers [CapSubscribe] methods on registered ICapSubscribe implementations.
-        services.AddTransient<OrderPlacedIntegrationEventHandler>();
-
-        services.AddCap(options =>
-        {
-            options.UseSqlServer(sqlServerOptions =>
-            {
-                sqlServerOptions.ConnectionString = moduleAConnectionString;
-                sqlServerOptions.Schema = "cap_modulea";
-            });
-
-            if (string.Equals(configuration["Cap:Transport"], "InMemory", StringComparison.OrdinalIgnoreCase))
-            {
-                options.UseInMemoryMessageQueue();
-            }
-            else
-            {
-                options.UseRabbitMQ(rabbitMqOptions =>
-                {
-                    rabbitMqOptions.HostName = configuration["RabbitMQ:HostName"] ?? "localhost";
-                });
-            }
-
-            options.DefaultGroupName = "modulea.catalog";
-        });
-
-        return services.BuildServiceProvider();
+        // CAP discovers [CapSubscribe] methods on registered ICapSubscribe implementations -
+        // this is discovered by the Gateway's own global AddCap call (Program.cs), not by
+        // Module A's private publish-only instance below.
+        services.AddTransient<ICapSubscribe, Subscriber>();
+        
+        return localServiceProvider;
     }
 }

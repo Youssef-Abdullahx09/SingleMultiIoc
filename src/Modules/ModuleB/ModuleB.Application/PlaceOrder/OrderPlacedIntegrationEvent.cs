@@ -1,4 +1,4 @@
-namespace ModuleB.Integration.Query;
+namespace ModuleB.Application.PlaceOrder;
 
 public sealed record OrderPlacedIntegrationEvent(
     Guid EventId,

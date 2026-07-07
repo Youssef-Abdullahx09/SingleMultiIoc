@@ -29,5 +29,7 @@ public sealed class ModuleADbContext(DbContextOptions<ModuleADbContext> options)
             entity.Property(r => r.OccurredAtUtc).IsRequired();
             entity.Property(r => r.ReceivedAtUtc).IsRequired();
         });
+
+        modelBuilder.Entity<Product>().HasData(SeedData.Products);
     }
 }

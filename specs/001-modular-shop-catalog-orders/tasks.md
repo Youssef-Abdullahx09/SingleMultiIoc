@@ -32,24 +32,24 @@ Per `plan.md` Project Structure: `src/Gateway/`, `src/Modules/ModuleA/{Domain,In
 
 **Purpose**: Solution and project skeleton with the exact reference graph mandated by the constitution.
 
-- [ ] T001 Create `ModularShop.sln` and `Directory.Build.props` at repo root (`net10.0`, `Nullable=enable`, `ImplicitUsings=enable`)
-- [ ] T002 [P] Create `src/Gateway/Gateway.csproj` (Microsoft.NET.Sdk.Web, net10.0)
-- [ ] T003 [P] Create `src/Modules/ModuleA/ModuleA.Domain/ModuleA.Domain.csproj` (classlib, no project references)
-- [ ] T004 [P] Create `src/Modules/ModuleA/ModuleA.Infrastructure/ModuleA.Infrastructure.csproj` referencing `ModuleA.Domain`, with `Microsoft.EntityFrameworkCore.SqlServer` + `Microsoft.EntityFrameworkCore.Design`
-- [ ] T005 [P] Create `src/Modules/ModuleA/ModuleA.Query/ModuleA.Query.csproj` (classlib, no project references)
-- [ ] T006 [P] Create `src/Modules/ModuleA/ModuleA.Application/ModuleA.Application.csproj` referencing `ModuleA.Query` + `ModuleA.Infrastructure`, with `MediatR`
-- [ ] T007 [P] Create `src/Modules/ModuleA/ModuleA.Integration.Query/ModuleA.Integration.Query.csproj` (classlib, no project references)
-- [ ] T008 [P] Create `src/Modules/ModuleA/ModuleA.Api/ModuleA.Api.csproj` referencing `ModuleA.Application`, with `DotNetCore.CAP`, `DotNetCore.CAP.SqlServer`, `DotNetCore.CAP.RabbitMQ`, `DotNetCore.CAP.InMemoryMessageQueue`
-- [ ] T009 [P] Create `src/Modules/ModuleB/ModuleB.Domain/ModuleB.Domain.csproj` (classlib, no project references)
-- [ ] T010 [P] Create `src/Modules/ModuleB/ModuleB.Infrastructure/ModuleB.Infrastructure.csproj` referencing `ModuleB.Domain`, with `Microsoft.EntityFrameworkCore.SqlServer` + `Microsoft.EntityFrameworkCore.Design`
-- [ ] T011 [P] Create `src/Modules/ModuleB/ModuleB.Query/ModuleB.Query.csproj` (classlib, no project references)
-- [ ] T012 [P] Create `src/Modules/ModuleB/ModuleB.Application/ModuleB.Application.csproj` referencing `ModuleB.Query` + `ModuleB.Infrastructure`, with `MediatR`
-- [ ] T013 [P] Create `src/Modules/ModuleB/ModuleB.Integration.Query/ModuleB.Integration.Query.csproj` (classlib, no project references)
-- [ ] T014 [P] Create `src/Modules/ModuleB/ModuleB.Api/ModuleB.Api.csproj` referencing `ModuleB.Application`, with `DotNetCore.CAP`, `DotNetCore.CAP.SqlServer`, `DotNetCore.CAP.RabbitMQ`, `DotNetCore.CAP.InMemoryMessageQueue`
-- [ ] T015 Add project reference from `ModuleA.Application.csproj` to `ModuleB.Integration.Query.csproj` — the single permitted cross-module reference (constitution Principle I)
-- [ ] T016 Add `Gateway.csproj` and all twelve module project files to `ModularShop.sln`
-- [ ] T017 Configure `src/Gateway/appsettings.json` — `ConnectionStrings:ModuleA`, `ConnectionStrings:ModuleB`, `ConnectionStrings:Global`, `Cap:Transport` (default `RabbitMQ`)
-- [ ] T018 Verify `dotnet build` succeeds with zero errors (constitution build-after-every-task gate)
+- [X] T001 Create `ModularShop.sln` and `Directory.Build.props` at repo root (`net10.0`, `Nullable=enable`, `ImplicitUsings=enable`)
+- [X] T002 [P] Create `src/Gateway/Gateway.csproj` (Microsoft.NET.Sdk.Web, net10.0)
+- [X] T003 [P] Create `src/Modules/ModuleA/ModuleA.Domain/ModuleA.Domain.csproj` (classlib, no project references)
+- [X] T004 [P] Create `src/Modules/ModuleA/ModuleA.Infrastructure/ModuleA.Infrastructure.csproj` referencing `ModuleA.Domain`, with `Microsoft.EntityFrameworkCore.SqlServer` + `Microsoft.EntityFrameworkCore.Design`
+- [X] T005 [P] Create `src/Modules/ModuleA/ModuleA.Query/ModuleA.Query.csproj` (classlib, no project references)
+- [X] T006 [P] Create `src/Modules/ModuleA/ModuleA.Application/ModuleA.Application.csproj` referencing `ModuleA.Query` + `ModuleA.Infrastructure`, with `MediatR`
+- [X] T007 [P] Create `src/Modules/ModuleA/ModuleA.Integration.Query/ModuleA.Integration.Query.csproj` (classlib, no project references)
+- [X] T008 [P] Create `src/Modules/ModuleA/ModuleA.Api/ModuleA.Api.csproj` referencing `ModuleA.Application`, with `DotNetCore.CAP`, `DotNetCore.CAP.SqlServer`, `DotNetCore.CAP.RabbitMQ`, `DotNetCore.CAP.InMemoryMessageQueue`
+- [X] T009 [P] Create `src/Modules/ModuleB/ModuleB.Domain/ModuleB.Domain.csproj` (classlib, no project references)
+- [X] T010 [P] Create `src/Modules/ModuleB/ModuleB.Infrastructure/ModuleB.Infrastructure.csproj` referencing `ModuleB.Domain`, with `Microsoft.EntityFrameworkCore.SqlServer` + `Microsoft.EntityFrameworkCore.Design`
+- [X] T011 [P] Create `src/Modules/ModuleB/ModuleB.Query/ModuleB.Query.csproj` (classlib, no project references)
+- [X] T012 [P] Create `src/Modules/ModuleB/ModuleB.Application/ModuleB.Application.csproj` referencing `ModuleB.Query` + `ModuleB.Infrastructure`, with `MediatR`
+- [X] T013 [P] Create `src/Modules/ModuleB/ModuleB.Integration.Query/ModuleB.Integration.Query.csproj` (classlib, no project references)
+- [X] T014 [P] Create `src/Modules/ModuleB/ModuleB.Api/ModuleB.Api.csproj` referencing `ModuleB.Application`, with `DotNetCore.CAP`, `DotNetCore.CAP.SqlServer`, `DotNetCore.CAP.RabbitMQ`, `DotNetCore.CAP.InMemoryMessageQueue`
+- [X] T015 Add project reference from `ModuleA.Application.csproj` to `ModuleB.Integration.Query.csproj` — the single permitted cross-module reference (constitution Principle I)
+- [X] T016 Add `Gateway.csproj` and all twelve module project files to `ModularShop.sln`
+- [X] T017 Configure `src/Gateway/appsettings.json` — `ConnectionStrings:ModuleA`, `ConnectionStrings:ModuleB`, `ConnectionStrings:Global`, `Cap:Transport` (default `RabbitMQ`)
+- [X] T018 Verify `dotnet build` succeeds with zero errors (constitution build-after-every-task gate)
 
 **Checkpoint**: Solution skeleton builds; reference graph matches constitution Principle II exactly.
 
@@ -61,20 +61,20 @@ Per `plan.md` Project Structure: `src/Gateway/`, `src/Modules/ModuleA/{Domain,In
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T019 [P] Create `Product` entity in `src/Modules/ModuleA/ModuleA.Domain/Product.cs` (Id Guid, Name, Price, CreatedAtUtc)
-- [ ] T020 [P] Create `Order` entity in `src/Modules/ModuleB/ModuleB.Domain/Order.cs` (Id Guid, ProductId, Quantity, PlacedAtUtc)
-- [ ] T021 Create `ModuleADbContext` in `src/Modules/ModuleA/ModuleA.Infrastructure/ModuleADbContext.cs` — schema `modulea`, maps `Product` (depends on T019)
-- [ ] T022 Create `ModuleBDbContext` in `src/Modules/ModuleB/ModuleB.Infrastructure/ModuleBDbContext.cs` — schema `moduleb`, maps `Order` (depends on T020)
-- [ ] T023 [P] Add initial EF Core migration for `ModuleADbContext` in `src/Modules/ModuleA/ModuleA.Infrastructure/Migrations/` (depends on T021)
-- [ ] T024 [P] Add initial EF Core migration for `ModuleBDbContext` in `src/Modules/ModuleB/ModuleB.Infrastructure/Migrations/` (depends on T022)
-- [ ] T025 Define `IOrderIntegrationQuery` interface in `src/Modules/ModuleB/ModuleB.Integration.Query/IOrderIntegrationQuery.cs` (`HasOrdersForProduct(Guid productId)`)
-- [ ] T026 Define `OrderPlacedIntegrationEvent` record in `src/Modules/ModuleB/ModuleB.Integration.Query/OrderPlacedIntegrationEvent.cs` (EventId, ProductId, Quantity, OccurredAtUtc)
-- [ ] T027 Implement `OrderIntegrationQuery : IOrderIntegrationQuery` in `src/Modules/ModuleB/ModuleB.Application/OrderIntegrationQuery.cs` — queries `ModuleBDbContext` for matching `ProductId` (depends on T022, T025)
-- [ ] T028 Create `ModuleBStartup` in `src/Modules/ModuleB/ModuleB.Api/ModuleBStartup.cs` — builds Module B's child `ServiceProvider`: registers `ModuleBDbContext` (`ModuleB` connection string), MediatR, `OrderIntegrationQuery`, CAP (`x.UseSqlServer` raw `ModuleB` connection string, schema `cap_moduleb`, group `moduleb.orders`, transport from `Cap:Transport`) (depends on T022, T027)
-- [ ] T029 Create `ModuleAStartup` in `src/Modules/ModuleA/ModuleA.Api/ModuleAStartup.cs` — builds Module A's child `ServiceProvider`: accepts a resolved `IOrderIntegrationQuery` instance as a parameter and registers it as singleton, registers `ModuleADbContext` (`ModuleA` connection string), MediatR, CAP (raw `ModuleA` connection string, schema `cap_modulea`, group `modulea.catalog`, transport from `Cap:Transport`) (depends on T021)
-- [ ] T030 Create `ChildContainerHost` (`IHostedService`) in `src/Gateway/ChildContainerHost.cs` — starts each module child container's registered `IHostedService`s on `StartAsync`, stops them in reverse on `StopAsync` (research.md §6)
-- [ ] T031 Wire `src/Gateway/Program.cs` — build Module B's container (T028) first, resolve `IOrderIntegrationQuery` from it, build Module A's container (T029) passing that instance, configure Gateway's own global CAP (raw `Global` connection string, schema `cap_gateway`, group `gateway.global`), register `ChildContainerHost` with both providers, apply EF Core migrations for both `DbContext`s at startup (depends on T028, T029, T030)
-- [ ] T032 Verify `dotnet build` succeeds and `dotnet run --project src/Gateway` starts cleanly with both module containers and `ChildContainerHost` initialized, no DI resolution errors (depends on T031)
+- [X] T019 [P] Create `Product` entity in `src/Modules/ModuleA/ModuleA.Domain/Product.cs` (Id Guid, Name, Price, CreatedAtUtc)
+- [X] T020 [P] Create `Order` entity in `src/Modules/ModuleB/ModuleB.Domain/Order.cs` (Id Guid, ProductId, Quantity, PlacedAtUtc)
+- [X] T021 Create `ModuleADbContext` in `src/Modules/ModuleA/ModuleA.Infrastructure/ModuleADbContext.cs` — schema `modulea`, maps `Product` (depends on T019)
+- [X] T022 Create `ModuleBDbContext` in `src/Modules/ModuleB/ModuleB.Infrastructure/ModuleBDbContext.cs` — schema `moduleb`, maps `Order` (depends on T020)
+- [X] T023 [P] Add initial EF Core migration for `ModuleADbContext` in `src/Modules/ModuleA/ModuleA.Infrastructure/Migrations/` (depends on T021)
+- [X] T024 [P] Add initial EF Core migration for `ModuleBDbContext` in `src/Modules/ModuleB/ModuleB.Infrastructure/Migrations/` (depends on T022)
+- [X] T025 Define `IOrderIntegrationQuery` interface in `src/Modules/ModuleB/ModuleB.Integration.Query/IOrderIntegrationQuery.cs` (`HasOrdersForProduct(Guid productId)`)
+- [X] T026 Define `OrderPlacedIntegrationEvent` record in `src/Modules/ModuleB/ModuleB.Integration.Query/OrderPlacedIntegrationEvent.cs` (EventId, ProductId, Quantity, OccurredAtUtc)
+- [X] T027 Implement `OrderIntegrationQuery : IOrderIntegrationQuery` in `src/Modules/ModuleB/ModuleB.Application/OrderIntegrationQuery.cs` — queries `ModuleBDbContext` for matching `ProductId` (depends on T022, T025)
+- [X] T028 Create `ModuleBStartup` in `src/Modules/ModuleB/ModuleB.Api/ModuleBStartup.cs` — builds Module B's child `ServiceProvider`: registers `ModuleBDbContext` (`ModuleB` connection string), MediatR, `OrderIntegrationQuery`, CAP (`x.UseSqlServer` raw `ModuleB` connection string, schema `cap_moduleb`, group `moduleb.orders`, transport from `Cap:Transport`) (depends on T022, T027)
+- [X] T029 Create `ModuleAStartup` in `src/Modules/ModuleA/ModuleA.Api/ModuleAStartup.cs` — builds Module A's child `ServiceProvider`: accepts a resolved `IOrderIntegrationQuery` instance as a parameter and registers it as singleton, registers `ModuleADbContext` (`ModuleA` connection string), MediatR, CAP (raw `ModuleA` connection string, schema `cap_modulea`, group `modulea.catalog`, transport from `Cap:Transport`) (depends on T021)
+- [X] T030 Create `ChildContainerHost` (`IHostedService`) in `src/Gateway/ChildContainerHost.cs` — starts each module child container's registered `IHostedService`s on `StartAsync`, stops them in reverse on `StopAsync` (research.md §6)
+- [X] T031 Wire `src/Gateway/Program.cs` — build Module B's container (T028) first, resolve `IOrderIntegrationQuery` from it, build Module A's container (T029) passing that instance, configure Gateway's own global CAP (raw `Global` connection string, schema `cap_gateway`, group `gateway.global`), register `ChildContainerHost` with both providers, apply EF Core migrations for both `DbContext`s at startup (depends on T028, T029, T030)
+- [X] T032 Verify `dotnet build` succeeds and `dotnet run --project src/Gateway` starts cleanly with both module containers and `ChildContainerHost` initialized, no DI resolution errors (depends on T031)
 
 **Checkpoint**: Foundation ready — user story implementation can now begin.
 
@@ -86,13 +86,13 @@ Per `plan.md` Project Structure: `src/Gateway/`, `src/Modules/ModuleA/{Domain,In
 
 **Independent Test**: Seed a product (and zero-or-more orders directly via SQL, per spec Assumptions — no seed endpoint), then call the product list and check-availability endpoints directly.
 
-- [ ] T033 [P] [US1] Create `ProductDto` in `src/Modules/ModuleA/ModuleA.Query/ProductDto.cs`
-- [ ] T034 [P] [US1] Create `AvailabilityResultDto` in `src/Modules/ModuleA/ModuleA.Query/AvailabilityResultDto.cs`
-- [ ] T035 [US1] Implement `GetProductsQuery` + handler in `src/Modules/ModuleA/ModuleA.Application/GetProductsQuery.cs` — MediatR query returning `List<ProductDto>` from `ModuleADbContext` (FR-001) (depends on T033)
-- [ ] T036 [US1] Implement `CheckAvailabilityCommand` + handler in `src/Modules/ModuleA/ModuleA.Application/CheckAvailabilityCommand.cs` — MediatR command: 404 result if product id not found (FR-003), otherwise calls `IOrderIntegrationQuery.HasOrdersForProduct` and returns `AvailabilityResultDto` (FR-002, FR-010) (depends on T034, T027)
-- [ ] T037 [US1] Map `GET /api/module-a/products` and `POST /api/module-a/products/{id}/check-availability` in `src/Modules/ModuleA/ModuleA.Api/CatalogEndpoints.cs` — each delegate resolves `IMediator` from Module A's own child-container scope per request (research.md §5) (depends on T035, T036)
-- [ ] T038 [US1] Register `CatalogEndpoints` mapping in `src/Gateway/Program.cs` (depends on T037, T031)
-- [ ] T039 [US1] Verify via `contracts/module-a-catalog.http` + `quickstart.md` US1 steps: seeded product appears in list; availability is false with no orders; 404 for unknown product id
+- [X] T033 [P] [US1] Create `ProductDto` in `src/Modules/ModuleA/ModuleA.Query/ProductDto.cs`
+- [X] T034 [P] [US1] Create `AvailabilityResultDto` in `src/Modules/ModuleA/ModuleA.Query/AvailabilityResultDto.cs`
+- [X] T035 [US1] Implement `GetProductsQuery` + handler in `src/Modules/ModuleA/ModuleA.Application/GetProductsQuery.cs` — MediatR query returning `List<ProductDto>` from `ModuleADbContext` (FR-001) (depends on T033)
+- [X] T036 [US1] Implement `CheckAvailabilityCommand` + handler in `src/Modules/ModuleA/ModuleA.Application/CheckAvailabilityCommand.cs` — MediatR command: 404 result if product id not found (FR-003), otherwise calls `IOrderIntegrationQuery.HasOrdersForProduct` and returns `AvailabilityResultDto` (FR-002, FR-010) (depends on T034, T027)
+- [X] T037 [US1] Map `GET /api/module-a/products` and `POST /api/module-a/products/{id}/check-availability` in `src/Modules/ModuleA/ModuleA.Api/CatalogEndpoints.cs` — each delegate resolves `IMediator` from Module A's own child-container scope per request (research.md §5) (depends on T035, T036)
+- [X] T038 [US1] Register `CatalogEndpoints` mapping in `src/Gateway/Program.cs` (depends on T037, T031)
+- [X] T039 [US1] Verify via `contracts/module-a-catalog.http` + `quickstart.md` US1 steps: seeded product appears in list; availability is false with no orders; 404 for unknown product id
 
 **Checkpoint**: User Story 1 fully functional and independently testable.
 
@@ -104,17 +104,17 @@ Per `plan.md` Project Structure: `src/Gateway/`, `src/Modules/ModuleA/{Domain,In
 
 **Independent Test**: Place an order via Module B, then observe Module A's recorded receipt of the notification, independent of any product-list/availability call in the same run.
 
-- [ ] T040 [P] [US2] Create `OrderDto` in `src/Modules/ModuleB/ModuleB.Query/OrderDto.cs`
-- [ ] T041 [US2] Implement `GetOrdersQuery` + handler in `src/Modules/ModuleB/ModuleB.Application/GetOrdersQuery.cs` — MediatR query returning `List<OrderDto>` (FR-004) (depends on T040)
-- [ ] T042 [US2] Implement `PlaceOrderCommand` + handler in `src/Modules/ModuleB/ModuleB.Application/PlaceOrderCommand.cs` — MediatR command: rejects non-positive quantity (FR-006, SC-006), persists `Order`, publishes `OrderPlacedIntegrationEvent` via `ICapPublisher.PublishAsync("moduleb.order.placed", ...)` after successful persistence (FR-007) (depends on T040, T026)
-- [ ] T043 [US2] Map `GET /api/module-b/orders` and `POST /api/module-b/orders` in `src/Modules/ModuleB/ModuleB.Api/OrdersEndpoints.cs` (depends on T041, T042)
-- [ ] T044 [US2] Register `OrdersEndpoints` mapping in `src/Gateway/Program.cs` (depends on T043)
-- [ ] T045 [P] [US2] Create `OrderReceipt` entity in `src/Modules/ModuleA/ModuleA.Domain/OrderReceipt.cs` (Id, IntegrationEventId unique, ProductId, Quantity, OccurredAtUtc, ReceivedAtUtc)
-- [ ] T046 [US2] Add `OrderReceipt` mapping + unique index on `IntegrationEventId` to `ModuleADbContext` and a new EF Core migration in `src/Modules/ModuleA/ModuleA.Infrastructure/` (depends on T045, T021)
-- [ ] T047 [US2] Implement `OrderPlacedIntegrationEventHandler` (`[CapSubscribe("moduleb.order.placed")]`) in `src/Modules/ModuleA/ModuleA.Application/OrderPlacedIntegrationEventHandler.cs` — upserts `OrderReceipt` by `IntegrationEventId`, logs duplicates without reprocessing (FR-008, FR-009) (depends on T046, T026)
-- [ ] T048 [US2] Register `OrderPlacedIntegrationEventHandler` as a CAP subscriber in `src/Modules/ModuleA/ModuleA.Api/ModuleAStartup.cs` (depends on T047, T029)
-- [ ] T049 [US2] Verify via `contracts/module-b-orders.http` + `quickstart.md` US2 steps 1-4: order placed and listed; invalid quantity rejected (SC-006); Module A logs receipt within 10s (SC-004); subsequent availability check for that product now returns true
-- [ ] T050 [US2] Verify idempotency via `quickstart.md` US2 step 5: redeliver the same `OrderPlacedIntegrationEvent` and confirm no duplicate `OrderReceipt` is created (FR-009)
+- [X] T040 [P] [US2] Create `OrderDto` in `src/Modules/ModuleB/ModuleB.Query/OrderDto.cs`
+- [X] T041 [US2] Implement `GetOrdersQuery` + handler in `src/Modules/ModuleB/ModuleB.Application/GetOrdersQuery.cs` — MediatR query returning `List<OrderDto>` (FR-004) (depends on T040)
+- [X] T042 [US2] Implement `PlaceOrderCommand` + handler in `src/Modules/ModuleB/ModuleB.Application/PlaceOrderCommand.cs` — MediatR command: rejects non-positive quantity (FR-006, SC-006), persists `Order`, publishes `OrderPlacedIntegrationEvent` via `ICapPublisher.PublishAsync("moduleb.order.placed", ...)` after successful persistence (FR-007) (depends on T040, T026)
+- [X] T043 [US2] Map `GET /api/module-b/orders` and `POST /api/module-b/orders` in `src/Modules/ModuleB/ModuleB.Api/OrdersEndpoints.cs` (depends on T041, T042)
+- [X] T044 [US2] Register `OrdersEndpoints` mapping in `src/Gateway/Program.cs` (depends on T043)
+- [X] T045 [P] [US2] Create `OrderReceipt` entity in `src/Modules/ModuleA/ModuleA.Domain/OrderReceipt.cs` (Id, IntegrationEventId unique, ProductId, Quantity, OccurredAtUtc, ReceivedAtUtc)
+- [X] T046 [US2] Add `OrderReceipt` mapping + unique index on `IntegrationEventId` to `ModuleADbContext` and a new EF Core migration in `src/Modules/ModuleA/ModuleA.Infrastructure/` (depends on T045, T021)
+- [X] T047 [US2] Implement `OrderPlacedIntegrationEventHandler` (`[CapSubscribe("moduleb.order.placed")]`) in `src/Modules/ModuleA/ModuleA.Application/OrderPlacedIntegrationEventHandler.cs` — upserts `OrderReceipt` by `IntegrationEventId`, logs duplicates without reprocessing (FR-008, FR-009) (depends on T046, T026)
+- [X] T048 [US2] Register `OrderPlacedIntegrationEventHandler` as a CAP subscriber in `src/Modules/ModuleA/ModuleA.Api/ModuleAStartup.cs` (depends on T047, T029)
+- [X] T049 [US2] Verify via `contracts/module-b-orders.http` + `quickstart.md` US2 steps 1-4: order placed and listed; invalid quantity rejected (SC-006); Module A logs receipt within 10s (SC-004); subsequent availability check for that product now returns true
+- [X] T050 [US2] Verify idempotency via `quickstart.md` US2 step 5: redeliver the same `OrderPlacedIntegrationEvent` and confirm no duplicate `OrderReceipt` is created (FR-009)
 
 **Checkpoint**: Both user stories independently functional; full spec success criteria (SC-001–SC-006) achievable end-to-end.
 
@@ -122,8 +122,8 @@ Per `plan.md` Project Structure: `src/Gateway/`, `src/Modules/ModuleA/{Domain,In
 
 ## Phase 5: Polish & Cross-Cutting Concerns
 
-- [ ] T051 Run full `quickstart.md` validation end-to-end (US1 + US2 in sequence) confirming SC-001 through SC-006
-- [ ] T052 [P] Audit project references across the solution against constitution Principle II (no forbidden cross-layer or cross-module references beyond `ModuleA.Application` → `ModuleB.Integration.Query`)
+- [X] T051 Run full `quickstart.md` validation end-to-end (US1 + US2 in sequence) confirming SC-001 through SC-006
+- [X] T052 [P] Audit project references across the solution against constitution Principle II (no forbidden cross-layer or cross-module references beyond `ModuleA.Application` → `ModuleB.Integration.Query`)
 
 ---
 

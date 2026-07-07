@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Modules\ModuleA\ModuleA.Api\ModuleA.Api.csproj" />
+    <ProjectReference Include="..\Modules\ModuleB\ModuleB.Api\ModuleB.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetCore.CAP" Version="10.0.0" />
+    <PackageReference Include="DotNetCore.CAP.RabbitMQ" Version="10.0.0" />
+    <PackageReference Include="DotNetCore.CAP.SqlServer" Version="10.0.0" />
+    <PackageReference Include="Savorboard.CAP.InMemoryMessageQueue" Version="10.0.0" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>

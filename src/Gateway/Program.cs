@@ -10,6 +10,9 @@ using Savorboard.CAP.InMemoryMessageQueue;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 // Gateway's own global CAP configuration (constitution Principle IV, amended) -
 // distinct group and schema from Module A's and Module B's own private publish-only
 // instances. Module A's inbound subscription (OrderPlacedIntegrationEventHandler,
@@ -52,6 +55,9 @@ builder.Services.AddHostedService<ChildContainerHost>();
 
 var app = builder.Build();
 
+app.UseSwagger();
+app.UseSwaggerUI();
+
 using (var moduleAMigrationScope = app.Services.CreateScope())
 {
     moduleAMigrationScope.ServiceProvider.GetRequiredService<ModuleADbContext>().Database.Migrate();
@@ -62,7 +68,6 @@ using (var moduleBMigrationScope = app.Services.CreateScope())
     moduleBMigrationScope.ServiceProvider.GetRequiredService<ModuleBDbContext>().Database.Migrate();
 }
 
-app.MapGet("/", () => "ModularShop Gateway");
 app.MapCatalogEndpoints();
 app.MapOrdersEndpoints();
 

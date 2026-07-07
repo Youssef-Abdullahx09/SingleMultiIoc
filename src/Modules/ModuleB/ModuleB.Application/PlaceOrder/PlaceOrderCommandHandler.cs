@@ -24,18 +24,23 @@ public sealed class PlaceOrderCommandHandler(
             PlacedAtUtc = DateTime.UtcNow,
         };
 
-        dbContext.Orders.Add(order);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        // Order row and outbox row commit atomically (transactional outbox) - actual broker
+        // delivery still happens after commit via CAP's own dispatcher, so it never blocks or
+        // rolls back the response (FR-007); this only guarantees the outbox row is never lost
+        // or duplicated relative to the order row.
+        await using var transaction = await capPublisher.BeginTransactionAsync(dbContext.Database, cancellationToken: cancellationToken);
 
-        // Fire-and-forget from the caller's perspective (FR-007) - publish happens after
-        // the order is durably persisted, so a delivery delay never blocks/rolls back placement.
         var integrationEvent = new OrderPlacedIntegrationEvent(
             EventId: Guid.NewGuid(),
             ProductId: order.ProductId,
             Quantity: order.Quantity,
             OccurredAtUtc: order.PlacedAtUtc);
 
+        dbContext.Orders.Add(order);
+        await dbContext.SaveChangesAsync(cancellationToken);
+        
         await capPublisher.PublishAsync("moduleb.order.placed", integrationEvent, cancellationToken: cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
 
         return new OrderDto(order.Id, order.ProductId, order.Quantity, order.PlacedAtUtc);
     }

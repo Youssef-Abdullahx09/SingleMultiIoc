@@ -1,4 +1,6 @@
 using DotNetCore.CAP;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace ModuleB.Infrastructure;
 
@@ -11,10 +13,24 @@ namespace ModuleB.Infrastructure;
 public interface IModuleBCapPublisher
 {
     Task PublishAsync<T>(string name, T contentObj, CancellationToken cancellationToken = default);
+
+    // Shares one ADO.NET transaction between ModuleBDbContext's SqlServer connection and CAP's
+    // own SqlServer outbox storage (cap_moduleb.Published), via DotNetCore.CAP.SqlServer's
+    // DatabaseFacade extension - never via UseEntityFramework, so Principle IV still holds.
+    Task<IDbContextTransaction> BeginTransactionAsync(
+        DatabaseFacade database,
+        bool autoCommit = false,
+        CancellationToken cancellationToken = default);
 }
 
 public sealed class ModuleBCapPublisher(ICapPublisher localCapPublisher) : IModuleBCapPublisher
 {
     public Task PublishAsync<T>(string name, T contentObj, CancellationToken cancellationToken = default) =>
         localCapPublisher.PublishAsync(name, contentObj, cancellationToken: cancellationToken);
+
+    public Task<IDbContextTransaction> BeginTransactionAsync(
+        DatabaseFacade database,
+        bool autoCommit = false,
+        CancellationToken cancellationToken = default) =>
+        database.BeginTransactionAsync(localCapPublisher, autoCommit, cancellationToken);
 }

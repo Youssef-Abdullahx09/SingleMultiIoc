@@ -1,0 +1,23 @@
+@baseUrl = http://localhost:5000
+
+### List all orders
+GET {{baseUrl}}/api/module-b/orders
+Accept: application/json
+
+### Place a new order (valid) — publishes OrderPlacedIntegrationEvent on success
+POST {{baseUrl}}/api/module-b/orders
+Content-Type: application/json
+
+{
+  "productId": "00000000-0000-0000-0000-000000000001",
+  "quantity": 2
+}
+
+### Place a new order with invalid quantity (expect: 400, no order persisted)
+POST {{baseUrl}}/api/module-b/orders
+Content-Type: application/json
+
+{
+  "productId": "00000000-0000-0000-0000-000000000001",
+  "quantity": 0
+}

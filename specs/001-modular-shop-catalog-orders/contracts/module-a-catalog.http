@@ -1,0 +1,18 @@
+@baseUrl = http://localhost:5000
+
+### List all products
+GET {{baseUrl}}/api/module-a/products
+Accept: application/json
+
+### Check availability for a product that HAS orders (expect: hasOrders = true)
+# Replace {{productId}} with a product id that Module B has placed an order against
+POST {{baseUrl}}/api/module-a/products/{{productId}}/check-availability
+Accept: application/json
+
+### Check availability for a product that has NO orders (expect: hasOrders = false)
+POST {{baseUrl}}/api/module-a/products/{{noOrderProductId}}/check-availability
+Accept: application/json
+
+### Check availability for a product id that does not exist (expect: 404)
+POST {{baseUrl}}/api/module-a/products/{{unknownProductId}}/check-availability
+Accept: application/json
